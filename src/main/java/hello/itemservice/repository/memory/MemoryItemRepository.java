@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class MemoryItemRepository implements ItemRepository {
+public class  MemoryItemRepository implements ItemRepository {
 
     private static final Map<Long, Item> store = new HashMap<>(); //static
     private static long sequence = 0L; //static
