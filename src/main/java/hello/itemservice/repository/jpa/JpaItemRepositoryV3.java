@@ -1,6 +1,7 @@
 package hello.itemservice.repository.jpa;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hello.itemservice.domain.Item;
 import hello.itemservice.repository.ItemRepository;
@@ -55,21 +56,26 @@ public class JpaItemRepositoryV3 implements ItemRepository {
         String itemName = cond.getItemName();
         Integer maxPrice = cond.getMaxPrice();
 
-        BooleanBuilder builder = new BooleanBuilder();
-
-        if (StringUtils.hasText(itemName)) {
-            builder.and(item.itemName.like("%" + itemName + "%"));
-        }
-
-        if (maxPrice != null) {
-            builder.and(item.price.loe(maxPrice));
-        }
-
+        // where()안에서 쉼표(,)는 and 처럼 인식되고, null인 것은 무시됨.
         return queryFactory
                 .select(item)
                 .from(item)
-                .where(builder)
+                .where(likeItemName(itemName), maxPrice(maxPrice))
                 .fetch();
+    }
+
+    private BooleanExpression likeItemName(String itemName) {
+        if (StringUtils.hasText(itemName)) {
+            return item.itemName.like("%" + itemName + "%");
+        }
+        return null;
+    }
+
+    private BooleanExpression maxPrice(Integer maxPrice) {
+        if (maxPrice != null) {
+            return item.price.loe(maxPrice);
+        }
+        return null;
     }
 
 }
